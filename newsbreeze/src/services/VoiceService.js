@@ -7,6 +7,28 @@ class VoiceService {
       "https://api-inference.huggingface.co/models/coqui/XTTS-v2";
     this.currentAudio = null;
     this.isPlaying = false;
+    this.voicesLoaded = false;
+    this.loadVoices();
+  }
+
+  loadVoices() {
+    if ("speechSynthesis" in window) {
+      // Load voices asynchronously
+      const loadVoicesEvent = () => {
+        this.voicesLoaded = true;
+      };
+
+      if (speechSynthesis.getVoices().length > 0) {
+        this.voicesLoaded = true;
+      } else {
+        speechSynthesis.addEventListener("voiceschanged", loadVoicesEvent);
+        // Fallback timeout
+        setTimeout(() => {
+          this.voicesLoaded = true;
+          speechSynthesis.removeEventListener("voiceschanged", loadVoicesEvent);
+        }, 3000);
+      }
+    }
   }
 
   getCelebrityVoices() {
@@ -55,17 +77,19 @@ class VoiceService {
   }
 
   async synthesizeSpeech(text, voiceId = "morgan_freeman") {
-    // For demo purposes, we'll use the Web Speech API with different settings
-    // In production, you would call the actual coqui/XTTS-v2 API
-
     if (!this.isWebSpeechSupported()) {
       console.warn("Web Speech API not supported, using fallback");
       return this.playFallbackAudio(text);
     }
 
     try {
-      // Stop any currently playing audio
+      // Stop any currently playing audio first
       this.stopSpeech();
+
+      // Wait for voices to load if not already loaded
+      if (!this.voicesLoaded) {
+        await this.waitForVoices();
+      }
 
       const utterance = new SpeechSynthesisUtterance(text);
 
@@ -77,25 +101,30 @@ class VoiceService {
 
       // Try to find a suitable voice
       const voices = speechSynthesis.getVoices();
-      const selectedVoice =
-        voices.find((voice) =>
-          voiceConfig.preferredVoices.some((pref) =>
-            voice.name.toLowerCase().includes(pref.toLowerCase())
-          )
-        ) || voices[0];
+      if (voices.length > 0) {
+        const selectedVoice =
+          voices.find((voice) =>
+            voiceConfig.preferredVoices.some((pref) =>
+              voice.name.toLowerCase().includes(pref.toLowerCase())
+            )
+          ) || voices[0];
 
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        }
       }
 
       return new Promise((resolve, reject) => {
         utterance.onend = () => {
           this.isPlaying = false;
+          this.currentAudio = null;
           resolve();
         };
 
         utterance.onerror = (error) => {
+          console.error("Speech synthesis error:", error);
           this.isPlaying = false;
+          this.currentAudio = null;
           reject(error);
         };
 
@@ -103,19 +132,46 @@ class VoiceService {
           this.isPlaying = true;
         };
 
-        speechSynthesis.speak(utterance);
+        // Store the utterance and start speaking
         this.currentAudio = utterance;
+        this.isPlaying = true;
+        speechSynthesis.speak(utterance);
       });
     } catch (error) {
       console.error("Error synthesizing speech:", error);
+      this.isPlaying = false;
+      this.currentAudio = null;
       throw error;
     }
   }
 
-  async synthesizeWithXTTS(text, voiceId) {
-    // This would be the actual implementation with coqui/XTTS-v2
-    // For now, we'll simulate the API call
+  async waitForVoices(timeout = 3000) {
+    return new Promise((resolve) => {
+      if (this.voicesLoaded || speechSynthesis.getVoices().length > 0) {
+        resolve();
+        return;
+      }
 
+      const checkVoices = () => {
+        if (speechSynthesis.getVoices().length > 0) {
+          this.voicesLoaded = true;
+          resolve();
+        }
+      };
+
+      speechSynthesis.addEventListener("voiceschanged", checkVoices, {
+        once: true,
+      });
+
+      // Fallback timeout
+      setTimeout(() => {
+        this.voicesLoaded = true;
+        resolve();
+      }, timeout);
+    });
+  }
+
+  async synthesizeWithXTTS(text, voiceId) {
     if (!this.huggingFaceApiKey) {
       throw new Error("Hugging Face API key required for XTTS-v2");
     }
@@ -139,7 +195,6 @@ class VoiceService {
         }
       );
 
-      // Create audio from blob
       const audioBlob = new Blob([response.data], { type: "audio/wav" });
       const audioUrl = URL.createObjectURL(audioBlob);
 
@@ -152,8 +207,6 @@ class VoiceService {
   }
 
   getSpeakerEmbedding(voiceId) {
-    // In a real implementation, these would be actual speaker embeddings
-    // for the celebrity voices trained with XTTS-v2
     const embeddings = {
       morgan_freeman: "embedding_morgan_freeman_base64...",
       david_attenborough: "embedding_david_attenborough_base64...",
@@ -220,12 +273,14 @@ class VoiceService {
 
       audio.onended = () => {
         this.isPlaying = false;
+        this.currentAudio = null;
         URL.revokeObjectURL(audioUrl);
         resolve();
       };
 
       audio.onerror = (error) => {
         this.isPlaying = false;
+        this.currentAudio = null;
         URL.revokeObjectURL(audioUrl);
         reject(error);
       };
@@ -240,30 +295,52 @@ class VoiceService {
   }
 
   playFallbackAudio(text) {
-    // Simulate audio playback for demo
     console.log(`Playing audio: "${text}"`);
     this.isPlaying = true;
 
     return new Promise((resolve) => {
-      const duration = Math.min(text.length * 50, 10000); // Simulate reading time
-      setTimeout(() => {
+      const duration = Math.min(text.length * 50, 10000);
+      this.currentAudio = { type: "fallback" };
+
+      const timeoutId = setTimeout(() => {
         this.isPlaying = false;
+        this.currentAudio = null;
         resolve();
       }, duration);
+
+      // Store timeout ID to clear it if stopped early
+      this.currentAudio.timeoutId = timeoutId;
     });
   }
 
   stopSpeech() {
-    if (this.currentAudio) {
-      if (this.currentAudio instanceof SpeechSynthesisUtterance) {
-        speechSynthesis.cancel();
-      } else if (this.currentAudio instanceof Audio) {
-        this.currentAudio.pause();
-        this.currentAudio.currentTime = 0;
+    try {
+      if (this.currentAudio) {
+        if (this.currentAudio instanceof SpeechSynthesisUtterance) {
+          speechSynthesis.cancel();
+        } else if (this.currentAudio instanceof Audio) {
+          this.currentAudio.pause();
+          this.currentAudio.currentTime = 0;
+        } else if (
+          this.currentAudio.type === "fallback" &&
+          this.currentAudio.timeoutId
+        ) {
+          clearTimeout(this.currentAudio.timeoutId);
+        }
+        this.currentAudio = null;
       }
+
+      // Always cancel speech synthesis to be sure
+      if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+      }
+
+      this.isPlaying = false;
+    } catch (error) {
+      console.error("Error stopping speech:", error);
+      this.isPlaying = false;
       this.currentAudio = null;
     }
-    this.isPlaying = false;
   }
 
   pauseSpeech() {

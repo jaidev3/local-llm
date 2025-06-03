@@ -47,17 +47,31 @@ function App() {
 
   const handlePlayArticle = async (article) => {
     try {
+      // If this article is currently playing, stop it
+      if (playingArticleId === article.id) {
+        VoiceService.stopSpeech();
+        setPlayingArticleId(null);
+        return;
+      }
+
       // Stop any currently playing audio
       VoiceService.stopSpeech();
       setPlayingArticleId(null);
 
       // Start playing the new article
-      setPlayingArticleId(article.id);
+      const currentArticleId = article.id;
+      setPlayingArticleId(currentArticleId);
 
-      const textToRead = `${article.title}. ${article.summary}`;
+      const textToRead = `${article.title}. ${
+        article.summary || article.description || ""
+      }`;
       await VoiceService.synthesizeSpeech(textToRead, selectedVoice);
 
-      setPlayingArticleId(null);
+      // Only clear playing state if this article is still the one playing
+      // (user might have clicked another article while this one was playing)
+      setPlayingArticleId((currentId) =>
+        currentId === currentArticleId ? null : currentId
+      );
     } catch (error) {
       console.error("Error playing article:", error);
       setPlayingArticleId(null);
