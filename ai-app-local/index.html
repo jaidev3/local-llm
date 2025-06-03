@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Writer - Local LLM</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div class="header-content">
+          <div class="logo">
+            <i class="fas fa-pen-nib"></i>
+            <h1>AI Writer</h1>
+          </div>
+          <div class="status-indicator">
+            <span class="status-dot" id="statusDot"></span>
+            <span class="status-text" id="statusText">Connecting...</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="input-section">
+          <div class="card">
+            <h2>What would you like me to write?</h2>
+            <div class="writing-type-selector">
+              <button class="type-btn active" data-type="blog">
+                <i class="fas fa-blog"></i>
+                Blog Intro
+              </button>
+              <button class="type-btn" data-type="tweet">
+                <i class="fab fa-twitter"></i>
+                Tweet
+              </button>
+              <button class="type-btn" data-type="story">
+                <i class="fas fa-book"></i>
+                Story
+              </button>
+              <button class="type-btn" data-type="email">
+                <i class="fas fa-envelope"></i>
+                Email
+              </button>
+            </div>
+
+            <div class="input-group">
+              <label for="topicInput">Topic or prompt:</label>
+              <textarea
+                id="topicInput"
+                placeholder="Enter your topic or specific prompt here..."
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="controls">
+              <div class="temperature-control">
+                <label for="temperatureSlider">
+                  <i class="fas fa-thermometer-half"></i>
+                  Creativity: <span id="temperatureValue">0.7</span>
+                </label>
+                <input
+                  type="range"
+                  id="temperatureSlider"
+                  min="0.1"
+                  max="1.0"
+                  step="0.1"
+                  value="0.7"
+                />
+                <div class="temperature-labels">
+                  <span>Precise</span>
+                  <span>Creative</span>
+                </div>
+              </div>
+
+              <button id="generateBtn" class="generate-btn">
+                <i class="fas fa-magic"></i>
+                Generate Content
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="output-section">
+          <div class="card">
+            <div class="output-header">
+              <h2>Generated Content</h2>
+              <div class="output-actions">
+                <button
+                  id="copyBtn"
+                  class="action-btn"
+                  title="Copy to clipboard"
+                >
+                  <i class="fas fa-copy"></i>
+                </button>
+                <button id="clearBtn" class="action-btn" title="Clear output">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="output-content">
+              <div id="loadingIndicator" class="loading-indicator hidden">
+                <div class="spinner"></div>
+                <p>AI is writing your content...</p>
+              </div>
+
+              <div id="outputText" class="output-text">
+                <div class="placeholder">
+                  <i class="fas fa-robot"></i>
+                  <p>Your AI-generated content will appear here</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="footer">
+        <p>
+          Powered by local LLM via LM Studio • No data sent to external servers
+        </p>
+      </footer>
+    </div>
+
+    <div id="errorModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-exclamation-triangle"></i> Connection Error</h3>
+          <button id="closeErrorModal" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p id="errorMessage"></p>
+          <div class="error-help">
+            <h4>Quick troubleshooting:</h4>
+            <ul>
+              <li>Make sure LM Studio is running</li>
+              <li>Load a model in LM Studio</li>
+              <li>Start the local server in the Developer tab</li>
+              <li>
+                Check if the server is running on
+                <code>http://localhost:1234</code>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
