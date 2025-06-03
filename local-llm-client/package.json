@@ -1,0 +1,21 @@
+{
+  "name": "local-llm-client",
+  "version": "1.0.0",
+  "description": "Simple client to interact with LM Studio using the official SDK",
+  "main": "local-llm-client.js",
+  "type": "module",
+  "scripts": {
+    "start": "node local-llm-client.js"
+  },
+  "dependencies": {
+    "@lmstudio/sdk": "^1.2.0"
+  },
+  "keywords": [
+    "llm",
+    "lm-studio",
+    "ai",
+    "local"
+  ],
+  "author": "",
+  "license": "MIT"
+}
