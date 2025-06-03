@@ -1,5 +1,7 @@
 # 🤖 AI Writer - Local LLM App
-- enable cors in developer settings of lm studio
+- enable cors in developer settings of lm studio.
+- open index.html file directly after setting up lm studio.
+
 A beautiful, modern AI writing assistant that runs entirely on your local machine using LM Studio. Generate blog intros, tweets, stories, and emails with complete privacy - no data sent to external servers!
 
 ![AI Writer Demo](https://img.shields.io/badge/Status-Ready-brightgreen) ![Local LLM](https://img.shields.io/badge/LLM-Local%20Only-blue) ![No API Keys](https://img.shields.io/badge/API%20Keys-Not%20Required-orange)
