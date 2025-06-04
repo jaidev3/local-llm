@@ -42,24 +42,46 @@ NewsBreeze transforms the way you consume news by combining the latest CNN headl
   - Hugging Face coqui/XTTS-v2 for celebrity voice cloning
 - **Fallback**: Web Speech API for demo mode
 
-## 📦 Installation
+## 📦 Installation & Setup
+
+### Prerequisites
+
+- **Node.js** (version 14 or higher) - [Download here](https://nodejs.org/)
+- **npm** (comes with Node.js) or **yarn**
+- **Modern web browser** (Chrome, Firefox, Safari, Edge)
+
+### Step-by-Step Installation
 
 1. **Clone the repository**
 
 ```bash
 git clone <repository-url>
+cd local-llm/newsbreeze
+```
+
+2. **Navigate to the project directory**
+
+**For Windows PowerShell:**
+
+```powershell
 cd newsbreeze
 ```
 
-2. **Install dependencies**
+**For Command Prompt or Git Bash:**
+
+```bash
+cd newsbreeze
+```
+
+3. **Install dependencies**
 
 ```bash
 npm install
 ```
 
-3. **Set up environment variables**
+4. **Set up environment variables (Optional but recommended)**
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the `newsbreeze` directory:
 
 ```env
 # Required for AI summarization and voice cloning
@@ -69,13 +91,222 @@ VITE_HUGGINGFACE_API_KEY=your_huggingface_api_key_here
 VITE_NEWS_API_KEY=your_news_api_key_here
 ```
 
-4. **Start the development server**
+5. **Start the development server**
 
 ```bash
 npm run dev
 ```
 
+6. **Open the application**
+
 The app will be available at `http://localhost:5173`
+
+### 🚀 Quick Start Commands
+
+**For Windows PowerShell users:**
+
+```powershell
+# Navigate to project
+cd local-llm
+cd newsbreeze
+
+# Install and run
+npm install
+npm run dev
+```
+
+**For Linux/Mac/Git Bash users:**
+
+```bash
+# Navigate to project
+cd local-llm/newsbreeze
+
+# Install and run
+npm install && npm run dev
+```
+
+## 🔧 Development Commands
+
+| Command           | Description              |
+| ----------------- | ------------------------ |
+| `npm run dev`     | Start development server |
+| `npm run build`   | Build for production     |
+| `npm run preview` | Preview production build |
+| `npm run lint`    | Run ESLint               |
+
+## 🏃‍♂️ Running the Project
+
+### Method 1: Standard Development
+
+1. Open terminal/command prompt
+2. Navigate to the newsbreeze directory:
+   ```bash
+   cd path/to/your/project/newsbreeze
+   ```
+3. Install dependencies (first time only):
+   ```bash
+   npm install
+   ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+5. Open browser and go to `http://localhost:5173`
+
+### Method 2: Using PowerShell (Windows)
+
+```powershell
+# Open PowerShell as Administrator (recommended)
+# Navigate to your project directory
+Set-Location "C:\Users\YourUsername\path\to\project\newsbreeze"
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+## 🐛 Common Issues & Solutions
+
+### Issue: "package.json not found"
+
+**Solution:** Make sure you're in the `newsbreeze` directory, not the parent directory.
+
+```bash
+# Wrong: Running from local-llm directory
+cd local-llm
+npm run dev  # ❌ This will fail
+
+# Correct: Running from newsbreeze directory
+cd local-llm/newsbreeze
+npm run dev  # ✅ This works
+```
+
+### Issue: PowerShell "&&" not recognized
+
+**Solution:** Use separate commands in PowerShell:
+
+```powershell
+# Instead of: cd newsbreeze && npm run dev
+# Use separate commands:
+cd newsbreeze
+npm run dev
+```
+
+### Issue: Port already in use
+
+**Solution:** Kill the process or use a different port:
+
+```bash
+# Kill process on port 5173
+npx kill-port 5173
+
+# Or specify different port
+npm run dev -- --port 3000
+```
+
+### Issue: Dependencies not installing
+
+**Solution:** Clear cache and reinstall:
+
+```bash
+# Clear npm cache
+npm cache clean --force
+
+# Remove node_modules and package-lock.json
+rm -rf node_modules package-lock.json
+
+# Reinstall
+npm install
+```
+
+## 🌐 Browser Compatibility
+
+- ✅ **Chrome** 60+
+- ✅ **Firefox** 55+
+- ✅ **Safari** 11+
+- ✅ **Edge** 79+
+
+### Web Speech API Support
+
+Voice synthesis requires Web Speech API support:
+
+- ✅ Chrome (full support)
+- ✅ Safari (full support)
+- ⚠️ Firefox (limited support)
+- ✅ Edge (full support)
+
+## 📁 Project Structure
+
+```
+newsbreeze/
+├── 📂 src/                  # Source code
+│   ├── 📂 components/       # React components
+│   ├── 📂 services/         # API services
+│   ├── 📄 App.jsx          # Main app component
+│   └── 📄 main.jsx         # Entry point
+├── 📂 public/              # Static assets
+├── 📄 package.json         # Dependencies
+├── 📄 vite.config.js       # Vite configuration
+├── 📄 tailwind.config.js   # Tailwind CSS config
+└── 📄 README.md            # This file
+```
+
+## 🎨 Customization
+
+### Adding New Celebrity Voices
+
+Edit `src/services/VoiceService.js` and add new voice configurations:
+
+```javascript
+{
+  id: 'new_celebrity',
+  name: 'Celebrity Name',
+  description: 'Voice description',
+  avatar: 'avatar_url',
+  sample: 'Sample text for voice preview'
+}
+```
+
+### Adding News Categories
+
+Edit `src/services/NewsService.js` to add new categories:
+
+```javascript
+{ id: 'category_id', name: 'Category Name', icon: '📱' }
+```
+
+## 🚀 Deployment
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+### Deploy to Vercel
+
+```bash
+npm install -g vercel
+vercel --prod
+```
+
+### Deploy to Netlify
+
+```bash
+npm run build
+# Upload the `dist` folder to Netlify
+```
+
+## 🎯 Usage
+
+1. **Browse News**: Latest CNN headlines are loaded automatically
+2. **Filter by Category**: Use the sidebar to filter news by topic
+3. **Summarize Articles**: Click the "Summarize" button to get an AI-generated summary
+4. **Select Celebrity Voice**: Choose your preferred celebrity voice from the sidebar
+5. **Listen to News**: Click "Play" to hear articles read in the selected celebrity voice
+6. **Control Playback**: Use stop/play controls to manage audio
 
 ## 🔑 API Keys Setup
 
@@ -95,15 +326,6 @@ The app currently uses a free CNN news endpoint, but you can optionally add a Ne
 1. Visit [NewsAPI.org](https://newsapi.org)
 2. Sign up for a free account
 3. Add the key to your `.env` file
-
-## 🎯 Usage
-
-1. **Browse News**: Latest CNN headlines are loaded automatically
-2. **Filter by Category**: Use the sidebar to filter news by topic
-3. **Summarize Articles**: Click the "Summarize" button to get an AI-generated summary
-4. **Select Celebrity Voice**: Choose your preferred celebrity voice from the sidebar
-5. **Listen to News**: Click "Play" to hear articles read in the selected celebrity voice
-6. **Control Playback**: Use stop/play controls to manage audio
 
 ## ✨ Key Features Walkthrough
 
