@@ -5,6 +5,7 @@ const NewsFeed = ({
   onPlayArticle,
   playingArticleId,
   selectedVoice,
+  onSummarize,
 }) => {
   if (articles.length === 0) {
     return (
@@ -51,6 +52,7 @@ const NewsFeed = ({
             onPlay={() => onPlayArticle(article)}
             isPlaying={playingArticleId === article.id}
             selectedVoice={selectedVoice}
+            onSummarize={onSummarize}
           />
         ))}
       </div>

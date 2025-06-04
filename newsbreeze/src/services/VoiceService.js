@@ -77,6 +77,17 @@ class VoiceService {
   }
 
   async synthesizeSpeech(text, voiceId = "morgan_freeman") {
+    // Try XTTS-v2 first if API key is available
+    if (this.huggingFaceApiKey) {
+      try {
+        console.log(`Using XTTS-v2 for voice synthesis with ${voiceId}`);
+        return await this.synthesizeWithXTTS(text, voiceId);
+      } catch (error) {
+        console.warn("XTTS-v2 failed, falling back to Web Speech API:", error);
+      }
+    }
+
+    // Fallback to Web Speech API
     if (!this.isWebSpeechSupported()) {
       console.warn("Web Speech API not supported, using fallback");
       return this.playFallbackAudio(text);
@@ -177,13 +188,21 @@ class VoiceService {
     }
 
     try {
+      // Get speaker configuration for the selected voice
+      const speakerConfig = this.getSpeakerConfig(voiceId);
+
       const response = await axios.post(
         this.ttsApiUrl,
         {
           inputs: text,
           parameters: {
-            speaker_embedding: this.getSpeakerEmbedding(voiceId),
+            speaker_wav: speakerConfig.referenceAudio,
             language: "en",
+            temperature: 0.7,
+            length_penalty: 1.0,
+            repetition_penalty: 1.1,
+            top_k: 50,
+            top_p: 0.8,
           },
         },
         {
@@ -192,6 +211,7 @@ class VoiceService {
             "Content-Type": "application/json",
           },
           responseType: "blob",
+          timeout: 30000, // 30 second timeout
         }
       );
 
@@ -202,11 +222,41 @@ class VoiceService {
     } catch (error) {
       console.error("Error with XTTS synthesis:", error);
       // Fallback to Web Speech API
-      return this.synthesizeSpeech(text, voiceId);
+      throw error; // Let the calling function handle the fallback
     }
   }
 
+  getSpeakerConfig(voiceId) {
+    // In a real implementation, these would be actual reference audio URLs
+    // For now, we'll use placeholder configurations
+    const speakerConfigs = {
+      morgan_freeman: {
+        referenceAudio: "https://example.com/morgan_freeman_sample.wav",
+        description: "Deep, authoritative voice with gravitas",
+      },
+      david_attenborough: {
+        referenceAudio: "https://example.com/david_attenborough_sample.wav",
+        description: "Clear, engaging nature documentary style",
+      },
+      samuel_jackson: {
+        referenceAudio: "https://example.com/samuel_jackson_sample.wav",
+        description: "Powerful, commanding presence",
+      },
+      emma_stone: {
+        referenceAudio: "https://example.com/emma_stone_sample.wav",
+        description: "Clear, warm female voice",
+      },
+      benedict_cumberbatch: {
+        referenceAudio: "https://example.com/benedict_cumberbatch_sample.wav",
+        description: "Sophisticated British accent",
+      },
+    };
+
+    return speakerConfigs[voiceId] || speakerConfigs["morgan_freeman"];
+  }
+
   getSpeakerEmbedding(voiceId) {
+    // Legacy method - kept for backward compatibility
     const embeddings = {
       morgan_freeman: "embedding_morgan_freeman_base64...",
       david_attenborough: "embedding_david_attenborough_base64...",

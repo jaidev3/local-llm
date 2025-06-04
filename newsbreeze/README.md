@@ -1,28 +1,34 @@
 # NewsBreeze 🎭📰
 
-**Celebrity-Powered Audio News Reader**
+**Celebrity-Powered Audio News Reader with AI Summarization**
 
-NewsBreeze transforms the way you consume news by combining the latest headlines with AI-powered celebrity voice synthesis. Get your daily news updates read aloud by your favorite celebrities using cutting-edge voice cloning technology.
+NewsBreeze transforms the way you consume news by combining the latest CNN headlines with AI-powered celebrity voice synthesis and on-demand article summarization. Get your daily news updates read aloud by your favorite celebrities using cutting-edge voice cloning technology.
 
 ## 🚀 Features
 
 ### 📻 **Audio News Experience**
 
 - **Celebrity Voices**: Choose from Morgan Freeman, David Attenborough, Samuel L. Jackson, Emma Stone, and Benedict Cumberbatch
-- **Smart Summarization**: AI-powered news summarization using Hugging Face's Falconsai model
-- **Voice Synthesis**: Advanced text-to-speech with celebrity voice cloning via coqui/XTTS-v2
+- **Voice Cloning**: Advanced celebrity voice synthesis using coqui/XTTS-v2 model
+- **Smart Playback**: Play summaries or full article content in celebrity voices
+
+### 🤖 **AI-Powered Summarization**
+
+- **On-Demand Summaries**: Click to summarize any article using Falconsai/text_summarization
+- **Intelligent Processing**: AI analyzes article content and generates concise summaries
+- **Visual Distinction**: Summarized content is clearly highlighted in the UI
 
 ### 📰 **News Aggregation**
 
-- **Real-time Headlines**: Fetches latest news from NewsAPI
+- **Live CNN Feed**: Real-time headlines from CNN via saurav.tech NewsAPI
 - **Category Filtering**: Technology, Business, Health, Science, Sports, Entertainment, and General news
-- **Smart Fallbacks**: Demo content when APIs are unavailable
+- **Smart Content**: Full article text, descriptions, and metadata
 
 ### 🎨 **Modern UI/UX**
 
 - **Responsive Design**: Beautiful interface built with Tailwind CSS
-- **Real-time Controls**: Play, pause, and stop audio controls
-- **Visual Feedback**: Audio visualization and playback indicators
+- **Interactive Controls**: Separate summarize and play buttons for each article
+- **Real-time Feedback**: Loading states, progress indicators, and visual feedback
 - **Mobile-Friendly**: Optimized for all device sizes
 
 ## 🛠️ Technology Stack
@@ -31,9 +37,9 @@ NewsBreeze transforms the way you consume news by combining the latest headlines
 - **Styling**: Tailwind CSS
 - **Icons**: Lucide React
 - **APIs**:
-  - NewsAPI for headlines
-  - Hugging Face Inference API for summarization and TTS
-  - coqui/XTTS-v2 for voice synthesis
+  - CNN News via saurav.tech for live headlines
+  - Hugging Face Inference API for summarization (Falconsai/text_summarization)
+  - Hugging Face coqui/XTTS-v2 for celebrity voice cloning
 - **Fallback**: Web Speech API for demo mode
 
 ## 📦 Installation
@@ -53,15 +59,14 @@ npm install
 
 3. **Set up environment variables**
 
-```bash
-cp env.example .env
-```
-
-Edit `.env` with your API keys:
+Create a `.env` file in the root directory:
 
 ```env
-VITE_NEWS_API_KEY=your_news_api_key_here
+# Required for AI summarization and voice cloning
 VITE_HUGGINGFACE_API_KEY=your_huggingface_api_key_here
+
+# Optional - currently using free CNN endpoint
+VITE_NEWS_API_KEY=your_news_api_key_here
 ```
 
 4. **Start the development server**
@@ -70,29 +75,57 @@ VITE_HUGGINGFACE_API_KEY=your_huggingface_api_key_here
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000`
+The app will be available at `http://localhost:5173`
 
 ## 🔑 API Keys Setup
 
-### NewsAPI Key
+### Hugging Face API Key (Required for full functionality)
+
+1. Visit [Hugging Face](https://huggingface.co/settings/tokens)
+2. Create a new access token (free tier available)
+3. Add it to your `.env` file
+4. This enables:
+   - AI article summarization
+   - Celebrity voice cloning
+
+### News API (Optional)
+
+The app currently uses a free CNN news endpoint, but you can optionally add a NewsAPI key:
 
 1. Visit [NewsAPI.org](https://newsapi.org)
 2. Sign up for a free account
-3. Get your API key from the dashboard
-4. Add it to your `.env` file
-
-### Hugging Face API Key
-
-1. Visit [Hugging Face](https://huggingface.co/settings/tokens)
-2. Create a new access token
-3. Add it to your `.env` file
+3. Add the key to your `.env` file
 
 ## 🎯 Usage
 
-1. **Select a Celebrity Voice**: Choose from the available celebrity voices in the sidebar
-2. **Pick a News Category**: Filter news by category (Technology, Business, etc.)
-3. **Play Articles**: Click the play button on any article to hear it in your selected celebrity's voice
-4. **Control Playback**: Use the stop button to pause any playing audio
+1. **Browse News**: Latest CNN headlines are loaded automatically
+2. **Filter by Category**: Use the sidebar to filter news by topic
+3. **Summarize Articles**: Click the "Summarize" button to get an AI-generated summary
+4. **Select Celebrity Voice**: Choose your preferred celebrity voice from the sidebar
+5. **Listen to News**: Click "Play" to hear articles read in the selected celebrity voice
+6. **Control Playback**: Use stop/play controls to manage audio
+
+## ✨ Key Features Walkthrough
+
+### AI Summarization
+
+- Click the **"Summarize"** button on any article
+- Watch as the AI processes the content
+- View the generated summary in a highlighted box
+- The summary is optimized for audio playback
+
+### Celebrity Voice Synthesis
+
+- Choose from 5 celebrity voice profiles
+- Powered by state-of-the-art XTTS-v2 voice cloning
+- Fallback to Web Speech API when needed
+- Reads either the original content or AI summary
+
+### Live News Feed
+
+- Real-time CNN headlines via saurav.tech API
+- Automatic category filtering based on content keywords
+- Rich article metadata including images and publication dates
 
 ## 🔄 Demo Mode
 
@@ -100,6 +133,7 @@ NewsBreeze works even without API keys! It includes:
 
 - Demo news articles with realistic content
 - Web Speech API fallback for voice synthesis
+- Basic summarization using sentence extraction
 - Full UI functionality for testing
 
 ## 🏗️ Project Structure

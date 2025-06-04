@@ -87,6 +87,15 @@ function App() {
     loadNews();
   };
 
+  const handleSummarize = (summarizedArticle) => {
+    // Update the article in the news state with the summary
+    setNews((prevNews) =>
+      prevNews.map((article) =>
+        article.id === summarizedArticle.id ? summarizedArticle : article
+      )
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onRefresh={handleRefresh} />
@@ -144,6 +153,7 @@ function App() {
                 onPlayArticle={handlePlayArticle}
                 playingArticleId={playingArticleId}
                 selectedVoice={selectedVoice}
+                onSummarize={handleSummarize}
               />
             )}
           </div>
